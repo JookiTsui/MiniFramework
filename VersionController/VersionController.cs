@@ -178,16 +178,17 @@ namespace MiniFramework
 			// 所有的AssetBundle
 			// 1. 凡是服务器有、本地没有的都加入待下载列表
 			// 2. 凡是服务器中AB的hash和本地不一致的，也加入待下载列表
-			bool needToDownload = true;
 			foreach(var serverAB in _serverManifest.GetAllAssetBundles()) {
-				// 检查本地manifest是否存在
-				if(_localManifest != null) {
+				bool needToDownload = true;
+				// 检查本地manifest是否存在, 不存在下载服务器所有的AssetBundle
+				if (_localManifest != null) {
 					foreach (var localAB in _localManifest.GetAllAssetBundles()) {
 						if (serverAB == localAB && _serverManifest.GetAssetBundleHash(serverAB) == _localManifest.GetAssetBundleHash(localAB)) {
 							needToDownload = false;
 						}
 					}
 				}
+				// 需要更新的AssetBundle，加入待下载列表
 				if (needToDownload) {
 					_toDownloadABsNameList.Add(serverAB);
 				}
@@ -205,7 +206,6 @@ namespace MiniFramework
 					Debug.Log("版本信息文件下载完成");
 				});
 			}
-			
 		}
 
 		private void SendRequestToDownLoadAB()

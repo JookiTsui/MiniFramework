@@ -34,13 +34,10 @@ public class AssetBundleManager : Singleton<AssetBundleManager>
 	public AssetBundleManager()
 	{
 		_bundleRootPath = BundlePersistentRootPath;
-		if (!File.Exists(_bundleRootPath))
+		if (!File.Exists(Path.Combine(_bundleRootPath, PlatformName)))
 		{
 			_bundleRootPath = BundleStreamingRootPath;
-		}
-
-		// 加载根目录下的AssetBundle[与文件夹同名]
-		AssetBundle assetBundle = AssetBundle.LoadFromFile(Path.Combine(_bundleRootPath, PlatformName));
+		}		// 加载根目录下的AssetBundle[与文件夹同名]		AssetBundle assetBundle = AssetBundle.LoadFromFile(Path.Combine(_bundleRootPath, PlatformName));
 		// 拿到Manifest
 		Manifest = assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
 		// clear the loaded Bundles reference count
@@ -86,7 +83,7 @@ public class AssetBundleManager : Singleton<AssetBundleManager>
 		if (_loadedBunddlesRefCount.ContainsKey(bundle))
 		{
 			_loadedBunddlesRefCount[bundle]++;
-			Debug.Log("Bundle " + bundle.name + " reference conut plus one, now is " + _loadedBunddlesRefCount[bundle]);
+			Debug.Log("Bundle " + bundle.name + " reference count plus one, now is " + _loadedBunddlesRefCount[bundle]);
 		}
 	}
 
@@ -101,11 +98,12 @@ public class AssetBundleManager : Singleton<AssetBundleManager>
 			if (_loadedBunddlesRefCount.ContainsKey(bundle))
 			{
 				_loadedBunddlesRefCount[bundle]--;
-				Debug.Log("Bundle " + bundle.name + " reference conut minus one, now is " + _loadedBunddlesRefCount[bundle]);
+				Debug.Log("Bundle " + bundle.name + " reference count minus one, now is " + _loadedBunddlesRefCount[bundle]);
 				if (_loadedBunddlesRefCount[bundle] == 0)
 				{
 					Debug.Log("Bundle " + bundle.name + " has been released");
 					bundle.Unload(true);
+					_loadedBunddlesRefCount.Remove(bundle);
 				}
 			}
 		}

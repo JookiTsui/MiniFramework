@@ -1,5 +1,5 @@
 ﻿using System;
-namespace MiniFramework
+using UnityEngine;namespace MiniFramework
 {
 	public interface IResLoader
 	{
@@ -10,11 +10,11 @@ namespace MiniFramework
 		/// <param name="assetName">填写资源在Asset目录下的文件名，不加后缀</param>
 		/// <returns></returns>
 		T LoadSync<T>(string assetName, string assetBundleName) where T : UnityEngine.Object;
-
-		/// <summary>
+		/// <summary>
 		/// 卸载资源
 		/// </summary>
 		/// <param name="obj"></param>
-		void Release();
+		void Release();		/// <summary>		/// 卸载指定的AssetBundle		/// </summary>		/// <param name="abName"></param>
+		void UnLoadAssetBundle(string abName);
 	}
 }

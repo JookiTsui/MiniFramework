@@ -1,0 +1,5 @@
+{"VersionCode":0.0, 
+"ResourceVersionCode":0.1,
+"ServerVersionConfigFilePath":"http://localhost/AssetBundleServer/VersionConfig.json",
+"ServerBundlesRootPath":"http://localhost/AssetBundleServer/AssetBundles"
+}

@@ -16,15 +16,13 @@ namespace MiniFramework
 		{
 			_abManager = AssetBundleManager.Instance;
 			_loadedBundles.Clear();
-			Debug.Log("Created a new RuntimeResLoader");
+			//Debug.Log("Created a new RuntimeResLoader");
 		}
 
 		~RuntimeResLoader()
 		{
 			Release();
-		}
-
-		/// <summary>
+		}		/// <summary>
 		/// Load Asset Sync By Asset Name and AssetBundle Name
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
@@ -61,6 +59,18 @@ namespace MiniFramework
 				_loadedBundles.Clear();
 			}
 		}
+
+		/// <summary>        /// Unload Target AssetBundle        /// </summary>        /// <param name="abName"></param>
+		public void UnLoadAssetBundle(string abName) {			Debug.Log("卸载之前Bundle的数量是： " + _loadedBundles.Count);			foreach (var loadedAB in _loadedBundles) {
+				Debug.Log("保存的abName是 " + loadedAB.name + ", 要删除的abName是 " + abName);
+				if (loadedAB.name == abName) {
+					Debug.Log("被移出的Bundle是： " + loadedAB.name);
+					_abManager.DecreaseBundlesReference(new List<AssetBundle>() { loadedAB });
+					_loadedBundles.Remove(loadedAB);
+					Debug.Log("卸载之后Bundle的数量是： " + _loadedBundles.Count);
+					return;
+				}
+			}						Debug.Log("没有找到名为 " + abName + " 的AB包，请重新确认包名（Tips: 注意后缀）");		}
 
 		private AssetBundle LoadAssetBundle(string assetBundleName)
 		{

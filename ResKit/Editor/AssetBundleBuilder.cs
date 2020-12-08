@@ -46,6 +46,7 @@ namespace MiniFramework
 			}
 			BuildPipeline.BuildAssetBundles(ABPath, BuildAssetBundleOptions.ChunkBasedCompression, target);
 			AssetDatabase.Refresh();
+			Debug.Log(target + " 端AB包打包完毕");
 		}
 	}
 }
