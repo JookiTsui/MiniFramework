@@ -4,20 +4,16 @@ using System.IO;
 using UnityEngine;
 
 public class AssetBundleManager : Singleton<AssetBundleManager>
-{
-
-#if UNITY_ANDROID
+{#if UNITY_ANDROID && !UNITY_EDITOR
 		public static string PlatformName = "Android";
-#elif UNITY_IOS
+#elif UNITY_IOS && !UNITY_EDITOR
 		public static string PlatformName = "iOS";
-#elif UNITY_STANDALONE_WIN
+#elif UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
 		public static string PlatformName = "StandaloneWindows";
-#elif UNITY_STANDALONE_OSX
+#elif UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 	public static string PlatformName = "StandaloneOSX";
 #endif
-
-	// AssetBundle File PersistenPath Path
-	public static string BundlePersistentRootPath = Path.Combine(Application.persistentDataPath, "AssetBundles", PlatformName);
+	// AssetBundle File PersistenPath Path	public static string BundlePersistentRootPath = Path.Combine(Application.persistentDataPath, "AssetBundles", PlatformName);
 	// AssetBundle File streamingAssetsPath Path
 	public static string BundleStreamingRootPath = Path.Combine(Application.streamingAssetsPath, "AssetBundles", PlatformName);
 	// AssetBundle File Path

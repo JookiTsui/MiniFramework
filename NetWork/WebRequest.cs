@@ -37,10 +37,10 @@ public class WebRequest : MonoSingleton<WebRequest>
 	}
 
 	public void LoadFileFromLocal(string filePath, Action<string> OnSuccessCallBack) {
-		StartCoroutine(LoaalLoclFile(filePath, OnSuccessCallBack));
+		StartCoroutine(LoadLocalFile(filePath, OnSuccessCallBack));
 	}
 
-	private IEnumerator LoaalLoclFile(string filePath, Action<string> OnSuccessCallBack)
+	private IEnumerator LoadLocalFile(string filePath, Action<string> OnSuccessCallBack)
 	{
 		Uri uri = new Uri(filePath);
 		var request = UnityWebRequest.Get(uri.AbsoluteUri);
@@ -55,7 +55,24 @@ public class WebRequest : MonoSingleton<WebRequest>
 		}
 	}
 
-	/// <summary>
+	public void LoadFileFromLocal(string filePath, Action<byte[]> OnSuccessCallBack)	{
+		StartCoroutine(LoadLocalFile(filePath, OnSuccessCallBack));
+	}
+
+	private IEnumerator LoadLocalFile(string filePath, Action<byte[]> OnSuccessCallBack)
+	{
+		Uri uri = new Uri(filePath);
+		var request = UnityWebRequest.Get(uri.AbsoluteUri);
+		yield return request.SendWebRequest();
+		if (CheckRequestError(request))		{
+			while (!request.downloadHandler.isDone)			{
+				yield return new WaitForSeconds(0.1f);
+			}
+			byte[] response = request.downloadHandler.data;
+
+			OnSuccessCallBack?.Invoke(response);
+		}
+	}	/// <summary>
 	/// 对外方法， 从服务器获取非文本文件
 	/// </summary>
 	/// <param name="url"></param>

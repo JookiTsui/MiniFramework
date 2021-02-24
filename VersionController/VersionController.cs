@@ -50,9 +50,7 @@ namespace MiniFramework
 		public void OnAppLoadCheckUpdate()
 		{
 			Debug.Log("persistentDataPath : " + Application.persistentDataPath);
-			if (!File.Exists(LocalVersionInfoPath)) {
-				Directory.Move(Path.Combine(Application.streamingAssetsPath, "VersionConfig.json"), LocalVersionInfoPath);
-				Directory.Move(Path.Combine(Application.streamingAssetsPath, "VersionConfig.json.meta"), LocalVersionInfoPath);
+			if (!File.Exists(LocalVersionInfoPath)) {				//Directory.Move(Path.Combine(Application.streamingAssetsPath, "VersionConfig.json"), LocalVersionInfoPath);				//Directory.Move(Path.Combine(Application.streamingAssetsPath, "VersionConfig.json.meta"), LocalVersionInfoPath);				string filePath = Path.Combine(Application.streamingAssetsPath, "VersionConfig.json");				WebRequest.Instance.LoadFileFromLocal(filePath, (bytes) =>				{					// 获取文件名					File.WriteAllBytes(LocalVersionInfoPath, bytes);				});
 			}
 
 			CheckOrDownloadRes();
@@ -123,8 +121,11 @@ namespace MiniFramework
 			// 如果PersistentPath路径下面还没有相关文件，则从StreamingPath复制过去
 			if (!Directory.Exists(localAssetBundleRootPath)) {
 				try {
-					Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "AssetBundles"));
-					Directory.Move(AssetBundleManager.BundleStreamingRootPath, localAssetBundleRootPath);
+					Directory.CreateDirectory(Path.Combine(Application.persistentDataPath, "AssetBundles"));					// 移动设备上，StreamingAssetPath不支持Directory操作#if UNITY_EDITOR
+					//Directory.Move(AssetBundleManager.BundleStreamingRootPath, localAssetBundleRootPath);					// 获取streamingAssetsPath/AssetBundles下的所有文件路径					string[] filePaths = Directory.GetFiles(AssetBundleManager.BundleStreamingRootPath);					for(int i=0; i<filePaths.Length; i++)					{						int fileIndex = i;						Debug.Log(filePaths[fileIndex]);						WebRequest.Instance.LoadFileFromLocal(filePaths[fileIndex], (bytes) =>						{							// 获取文件名							string fileName = filePaths[fileIndex].Substring(filePaths[fileIndex].LastIndexOf('/') + 1);							File.WriteAllBytes(Path.Combine(localAssetBundleRootPath, fileName), bytes);						});					}#else
+					// 移动设备上，StreamingAssetPath不支持Directory操作
+					
+#endif
 				} catch (Exception ex) {
 					throw new Exception("创建目录失败" + ex.Message);
 				}
@@ -133,9 +134,7 @@ namespace MiniFramework
 		}
 
 		private void UpdateAllResources()
-		{
-			// 先删除根目录下的所有文件
-			Directory.Delete(localAssetBundleRootPath, true);
+		{			// 先删除根目录下的所有文件			if (Directory.Exists(localAssetBundleRootPath))			{				Directory.Delete(localAssetBundleRootPath, true);			}
 			// 再重新生成一个AssetBundle的根目录
 			try {
 				Directory.CreateDirectory(localAssetBundleRootPath);
@@ -165,19 +164,15 @@ namespace MiniFramework
 					WebRequest.Instance.GetAssetBundle(new Uri(localManifestPath).AbsoluteUri, (localAssetBundle) => {
 						_localManifest = localAssetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
 						localAssetBundle.Unload(false);
+						CompareManifestDiff();
 					});
 				}
 				// 服务器和本地的Manifest文件均加载完毕，进行比较
-				CompareManifestDiff();
-				
 			});
 		}
 
 		private void CompareManifestDiff()
-		{
-			// 所有的AssetBundle
-			// 1. 凡是服务器有、本地没有的都加入待下载列表
-			// 2. 凡是服务器中AB的hash和本地不一致的，也加入待下载列表
+		{			// 所有的AssetBundle			// 1. 凡是服务器有、本地没有的都加入待下载列表			// 2. 凡是服务器中AB的hash和本地不一致的，也加入待下载列表
 			foreach(var serverAB in _serverManifest.GetAllAssetBundles()) {
 				bool needToDownload = true;
 				// 检查本地manifest是否存在, 不存在下载服务器所有的AssetBundle
@@ -191,6 +186,7 @@ namespace MiniFramework
 				// 需要更新的AssetBundle，加入待下载列表
 				if (needToDownload) {
 					_toDownloadABsNameList.Add(serverAB);
+					_toDownloadABsNameList.Add(serverAB + ".manifest");
 				}
 			}
 
@@ -198,9 +194,9 @@ namespace MiniFramework
 				// 有资源要更更新
 				// 把主AssetBundle也加入下载列表，主AssetBundle名与运行平台同名
 				_toDownloadABsNameList.Add(AssetBundleManager.PlatformName);
+				_toDownloadABsNameList.Add(AssetBundleManager.PlatformName + ".manifest");
 				SendRequestToDownLoadAB();
-			} else {
-				// 没有资源要更新，但是也更新下版本信息文件
+			} else {				// 没有资源要更新，但是也更新下版本信息文件				Debug.Log("资源没有变化，不需要更新");
 				WebRequest.Instance.Send(_localVersionInfo.ServerVersionConfigFilePath, (byte[] fileData) => {
 					SaveFileToLocal(LocalVersionInfoPath, fileData);
 					Debug.Log("版本信息文件下载完成");
@@ -234,11 +230,12 @@ namespace MiniFramework
 
 		void SaveFileToLocal(string Path, byte[] data)
 		{
-			FileStream fs = File.Create(Path);
-			fs.Write(data, 0, data.Length);
-			fs.Flush();
-			fs.Close();
-			fs.Dispose();
+			File.WriteAllBytes(Path, data);
+			//FileStream fs = File.Create(Path);
+			//fs.Write(data, 0, data.Length);
+			//fs.Flush();
+			//fs.Close();
+			//fs.Dispose();
 		}
 	}
 }
