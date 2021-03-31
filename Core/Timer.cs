@@ -16,7 +16,7 @@ public class TimerMgr : Singleton<TimerMgr>
     /// <param name="repeatTimes"></param>
     /// <param name="callback"></param>
     /// <returns></returns>
-    public Timer CreateTimer(float delayTime, int repeatTimes, Action callback)    {        Timer timer = new Timer(delayTime, repeatTimes, callback);        _loopCallbacks += timer.Loop;        return timer;    }
+    public Timer CreateTimer(float delayTime, Action callback, int repeatTimes = 1)    {        Timer timer = new Timer(delayTime, repeatTimes, callback);        _loopCallbacks += timer.Loop;        return timer;    }
 
     public void Start(Timer timer)    {        timer.Start();    }
 
@@ -26,7 +26,7 @@ public class TimerMgr : Singleton<TimerMgr>
     /// <param name="delayTime"></param>
     /// <param name="repeatTimes"></param>
     /// <param name="callback"></param>
-    public void CreateTimerAndStart(float delayTime, Action callback, int repeatTimes = 1)    {        Start(CreateTimer(delayTime, repeatTimes, callback));    }
+    public void CreateTimerAndStart(float delayTime, Action callback, int repeatTimes = 1)    {        Start(CreateTimer(delayTime, callback, repeatTimes));    }
 
     /// <summary>
     /// Loop需要通过外部的MonoBehavior的Update来驱动

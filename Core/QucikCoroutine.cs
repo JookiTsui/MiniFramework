@@ -1,0 +1,4 @@
+﻿using System.Collections;
+using UnityEngine;namespace MiniFramework{	//public class QucikCoroutine : Singleton<QucikCoroutine>	//   {	//       GameObject _quickCoroutine;	//       public void Start(IEnumerator callBack)	//	{	//           MonoBehaviour _mono;	//           if(_quickCoroutine == null)	//		{	//               _quickCoroutine = new GameObject("QuickCoroutine");	//               GameObject.DontDestroyOnLoad(_quickCoroutine);	//               _mono = _quickCoroutine.AddComponent<MonoBehaviour>();	//		}	//		else	//		{	//               _mono = _quickCoroutine.GetComponent<MonoBehaviour>();	//		}	//           _mono.StartCoroutine(callBack);	//	}	//   }	public class QucikCoroutine : MonoSingleton<QucikCoroutine>	{		public void Run(IEnumerator callback)		{			StartCoroutine(callback);		}	}}
+
+
